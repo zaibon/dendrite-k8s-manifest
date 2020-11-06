@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dendrite-service
+  namespace: dendrite
+spec:
+  selector:
+    app: dendrite
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8008
+      name: client
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dendrite-db-svc
+  namespace: dendrite
+spec:
+  ports:
+    - port: 5432
+      protocol: TCP
+  selector:
+    app: dendrite-db

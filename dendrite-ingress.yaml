@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dendrite-ingress
+  namespace: dendrite
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - <server_name>
+      secretName: matrix-tls
+  rules:
+    - host: "<server_name>"
+      http:
+        paths:
+          - path: "/"
+            backend:
+              serviceName: dendrite-service
+              servicePort: 8008

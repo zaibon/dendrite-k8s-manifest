@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dendrite
+  name: dendrite
+  namespace: dendrite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dendrite
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: dendrite
+    spec:
+      containers:
+        - image: matrixdotorg/dendrite-monolith:latest
+          imagePullPolicy: ""
+          name: dendrite
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/dendrite
+              name: config-volume
+            - mountPath: /etc/dendrite/keys
+              name: secret-volume
+          ports:
+            - containerPort: 8008
+      hostname: dendrite
+      restartPolicy: Always
+      volumes:
+        - name: config-volume
+          configMap:
+            name: dendrite-cm
+        - name: secret-volume
+          secret:
+            secretName: dendrite-cert
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dendrite-db
+  namespace: dendrite
+  labels:
+    app: dendrite
+spec:
+  selector:
+    matchLabels:
+      app: dendrite-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dendrite-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:9.6
+          envFrom:
+            - configMapRef:
+                name: dendrite-db-cm
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: dendrite-db-pv
+              mountPath: /var/lib/postgresql/data
+              subPath: dendrite-db
+            - name: dendrite-db-init
+              mountPath: /docker-entrypoint-initdb.d/20-create_db.sh
+              subPath: 20-create_db.sh
+      volumes:
+        - name: dendrite-db-pv
+          persistentVolumeClaim:
+            claimName: dendrite-db-pvc
+        - name: dendrite-db-init
+          configMap:
+            name: dendrite-db-init-cm
+            defaultMode: 0755
+---
+
