@@ -1,6 +1,6 @@
 # K8S manifest for Dendrite
 
-Deploy a [Dendrite](https://github.com/matrix-org/dendrite) monolith server on a K8S cluster.
+Deploy a [Dendrite](https://github.com/matrix-org/dendrite) monolith server on a K8S cluster (v1.16).
 
 ## Preparation
 
