@@ -1,0 +1,17 @@
+name: Linter
+
+on:
+  push:
+  pull_request:
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Scan repo
+        id: kube-lint-repo
+        uses: stackrox/kube-linter-action@v1
+        with:
+          directory: .
